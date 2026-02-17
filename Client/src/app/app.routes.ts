@@ -5,5 +5,5 @@ import { VendorDashboard } from './components/vendor-dashboard/vendor-dashboard'
 export const routes: Routes = [
   { path: 'client', component: ClientRequest },
   { path: 'vendor', component: VendorDashboard },
-  { path: '', redirectTo: '/client', pathMatch: 'full' } // Default page
+  { path: '', redirectTo: '/client', pathMatch: 'full' } 
 ];

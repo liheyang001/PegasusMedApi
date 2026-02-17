@@ -4,7 +4,7 @@
 * .NET 10 SDK
 * PostgreSQL
 * Node.js
-* Angular
+* Angular CLI (npm install -g @angular/cli)
 
 ### Installation
 1. Clone the repo: `git clone https://github.com/liheyang001/PegasusMedApi.git`
@@ -19,9 +19,45 @@ To run this project locally, you need to set up the PostgreSQL Database
 }```
 5. Run ```dotnet ef database update``` in the terminal
 
+### Frontend Setup (Angular)
+1. Navigate to the client folder: cd PegasusMedApi.Client
+2. Install dependencies: npm install
+3. Start the dev server: ng serve
+4. Open your browser to http://localhost:4200
+
 ### API endpoints
 The API will be available at: http://localhost:5000
-1. Client create request to target vendor - POST /api/requests
+Swagger is available at: http://localhost:5000/swagger/v1/swagger.json
+
+1. Retrieves all medical supply requests - GET /api/requests
+```Example Response Body:
+JSON
+[
+    {
+        "id": 25,
+        "clientId": "0",
+        "itemDetails": "",
+        "createdAt": "2026-02-17T10:40:02.787537Z",
+        "vendorAssignments": []
+    },
+    {
+        "id": 24,
+        "clientId": "1",
+        "itemDetails": "sdweqw",
+        "createdAt": "2026-02-17T10:38:04.988068Z",
+        "vendorAssignments": [
+            {
+                "id": 58,
+                "medRequestId": 24,
+                "vendorId": "dsdd",
+                "isFlagged": true,
+                "acknowledgedAt": "2026-02-17T11:03:31.852375Z"
+            }
+        ]
+    }
+] 
+```
+2. Client create request to target vendor - POST /api/requests
 ```Example Request Body:
 JSON
 {
@@ -31,7 +67,7 @@ JSON
   "isFlagged": true
 }
 ```
-2. Client request details by ID - GET /api/requests/{id}
+3. Client request details by ID - GET /api/requests/{id}
 ```Example Response Body:
 JSON
 {
@@ -48,7 +84,7 @@ JSON
   ]
 }
 ```
-3. Vendor retrieve all requests by VendorID - Get /api/requests/vendor/{vendorId}
+4. Vendor retrieve all requests by VendorID - Get /api/requests/vendor/{vendorId}
 ```Example Response Body:
 JSON
 [
@@ -68,10 +104,19 @@ JSON
     }
 ]
 ```
-4. Vendor update IsFlagged Status - PATCH /api/requests/{id}/vendor/{vendorId}/acknowledge
+5. Vendor update IsFlagged Status - PATCH /api/requests/{id}/vendor/{vendorId}/acknowledge
 ```Example Response Body:
 JSON
 {
     "message": "Update successful"
 }
+```
+6. Get All Vendors - GET /api/requests/vendors
+```Example Response Body:
+JSON
+[
+    "VEND-001",
+    "VEND-002",
+    "VEND-003"
+]
 ```

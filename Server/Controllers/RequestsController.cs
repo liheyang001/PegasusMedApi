@@ -24,6 +24,21 @@ public class RequestsController : ControllerBase
     public RequestsController(ApiDbContext db) => _db = db;
 
     /// <summary>
+    /// Retrieves a list of all medical supply requests, including vendor assignment statuses.
+    /// </summary>
+    /// <returns>A list of medical requests with their associated vendor data.</returns>
+    [HttpGet]
+    public async Task<IActionResult> GetAllRequests()
+    {
+        var requests = await _db.Requests
+            .Include(r => r.VendorAssignments)
+            .OrderByDescending(r => r.CreatedAt)
+            .ToListAsync();
+            
+        return Ok(requests);
+    }
+
+    /// <summary>
     /// Creates a new medical supply request and assigns it to specified vendors.
     /// </summary>
     /// <param name="req">The request payload from the client.</param>
@@ -120,5 +135,21 @@ public class RequestsController : ControllerBase
         assignment.IsFlagged = true; 
         await _db.SaveChangesAsync();
         return Ok(new { message = "Update successful" });
+    }
+
+    /// <summary>
+    /// Retrieves a unique list of all Vendor IDs from the existing assignments.
+    /// </summary>
+    [HttpGet("vendors")]
+    public async Task<IActionResult> GetVendors()
+    {
+        // This query gets all unique vendor IDs currently in your database
+        var vendors = await _db.VendorStatuses
+            .Select(v => v.VendorId)
+            .Distinct()
+            .ToListAsync();
+
+        // Returning as a simple list of strings to match your current logic
+        return Ok(vendors);
     }
 }

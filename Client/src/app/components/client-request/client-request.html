@@ -1,1 +1,125 @@
-<p>client-request works!</p>
+<div class="client-container" [class.blurred]="isModalOpen">
+    <div class="page-header">
+      <div class="header-text">
+        <h1>Client Portal</h1>
+        <p>Monitor your medical supply chain requests</p>
+      </div>
+      <button class="btn-new-request" (click)="openCreateModal()">
+        <span class="icon">+</span> New Request
+      </button>
+    </div>
+  
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-label">Total Requests</span>
+        <span class="stat-value">{{ requests().length }}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Pending Acknowledgement</span>
+        <span class="stat-value highlight">{{ pendingCount() }}</span>
+      </div>
+    </div>
+  
+    <div class="content-card">
+      <h3>Recent Requests</h3>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Item Details</th>
+              <th>Created Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let req of requests()">
+              <td>#{{ req.id }}</td>
+              <td>{{ req.itemDetails }}</td>
+              <td>{{ req.createdAt | date:'short' }}</td>
+              <td>
+                <button class="btn-view" (click)="viewDetails(req.id)">View Details</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal-backdrop" *ngIf="isModalOpen" (click)="closeModal()">
+    <div class="modal-window" (click)="$event.stopPropagation()">
+      
+      <div class="modal-header">
+        <h3>{{ modalMode === 'create' ? 'Create New Request' : 'Request Details' }}</h3>
+        <button class="close-x" (click)="closeModal()">&times;</button>
+      </div>
+  
+      <div class="modal-body">
+        
+        <form *ngIf="modalMode === 'create'" (submit)="submitRequest()" class="request-form">
+            <div class="form-group">
+                <label class="detail-label">Client ID</label>
+                <input [(ngModel)]="newRequest.clientId" name="clientId" class="form-input no-spinner" placeholder="e.g. 3">
+            </div>
+  
+            <div class="form-group">
+                <label class="detail-label">Item Details</label>
+                <textarea 
+                [(ngModel)]="newRequest.itemDetails" 
+                name="details" 
+                placeholder="e.g. 50x Heart Rate Monitors"
+                class="form-textarea">
+                </textarea>
+            </div>
+  
+            <div class="form-group">
+                <label class="detail-label">Target Vendor IDs</label>
+                <input 
+                type="text" 
+                [(ngModel)]="newRequest.vendorIds" 
+                name="vendors" 
+                placeholder="VEND-001, VEND-002"
+                class="form-input">
+                <small class="form-help">Separate multiple IDs with commas</small>
+            </div>
+  
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" (click)="closeModal()">Cancel</button>
+                <button type="submit" class="btn-submit">Send to Vendors</button>
+            </div>
+        </form>
+  
+        <div *ngIf="modalMode === 'view'">
+            <div *ngIf="!selectedRequest()" class="loading-container">
+                <p>Fetching request data...</p>
+            </div>
+          
+            <div *ngIf="selectedRequest()">
+                <div class="detail-section">
+                <label class="detail-label">Items Requested</label>
+                <div class="item-details-box">
+                    {{ selectedRequest()?.itemDetails }}
+                </div>
+            </div>
+  
+            <div class="detail-section">
+              <label class="detail-label">Vendor Status Tracking</label>
+              <div class="vendor-list">
+                <div class="vendor-row-header">
+                  <span>Vendor ID</span>
+                  <span>Current Status</span>
+                </div>
+                <div class="vendor-row" *ngFor="let v of selectedRequest()?.vendorAssignments">
+                  <span class="vendor-id-text">{{ v.vendorId }}</span>
+                  <span class="status-badge" [class.acknowledged]="v.acknowledgedAt">
+                    {{ v.acknowledgedAt ? 'Acknowledged' : 'Pending' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

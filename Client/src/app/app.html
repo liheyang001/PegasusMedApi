@@ -1,25 +1,16 @@
-<div class="dashboard-container">
+<div class="app-layout">
   <aside class="sidebar">
     <div class="logo">
-      <span class="icon">💚</span> Pegasus Med Dashboard
+      <h2><span class="icon">💚</span> Pegasus Med</h2>
     </div>
     <nav>
-      <a routerLink="/client" routerLinkActive="active" class="nav-item">Client Request</a>
-      <a routerLink="/vendor" routerLinkActive="active" class="nav-item">Vendor Simulation</a>
+      <a routerLink="/client" routerLinkActive="active" class="nav-item">Client Portal</a>
+      <a routerLink="/vendor" routerLinkActive="active" class="nav-item">Vendor Portal</a>
     </nav>
-    <div class="sidebar-footer">
-      © 2026 Pegasus Med
-    </div>
+    <div class="sidebar-footer">© 2026 Pegasus Med</div>
   </aside>
 
   <main class="main-content">
-    <header>
-      <h1>System Overview</h1>
-      <p>Real-time status of all active supply requests and vendor interactions.</p>
-    </header>
-
-    <main class="main-content">
-      <router-outlet></router-outlet>
-    </main>
+    <router-outlet></router-outlet>
   </main>
 </div>

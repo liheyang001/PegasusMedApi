@@ -1,1 +1,65 @@
-<p>vendor-dashboard works!</p>
+<div class="vendor-container">
+    <div class="page-header">
+      <div class="header-text">
+        <h1>Vendor Portal</h1>
+        <p class="subtitle">Assignments for <strong>{{ selectedVendorId() }}</strong></p>
+      </div>
+      
+      <div class="vendor-switcher">
+        <label>Acting as Vendor:</label>
+        <select [ngModel]="selectedVendorId()" (change)="onVendorChange($event)" class="vendor-select">
+          <option *ngFor="let id of vendorList()" [value]="id">{{ id }}</option>
+        </select>
+      </div>
+    </div>
+  
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-label">Total Assigned</span>
+        <span class="stat-value">{{ allRequests().length }}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Pending Action</span>
+        <span class="stat-value highlight">{{ pendingActionCount() }}</span>
+      </div>
+    </div>
+  
+    <div class="content-card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Request ID</th>
+            <th>Items Requested</th>
+            <th>Created Date</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let req of allRequests()">
+            <td class="id-cell">#{{ req.id }}</td>
+            <td>{{ req.itemDetails }}</td>
+            <td>{{ req.createdAt | date:'shortDate' }}</td>
+            <td>
+              <span class="status-badge" [class.acknowledged]="req.isFlagged">
+                {{ req.isFlagged ? 'Acknowledged' : 'Pending' }}
+              </span>
+            </td>
+            <td>
+              <button 
+                class="btn-action" 
+                *ngIf="!req.isFlagged" 
+                (click)="acknowledgeRequest(req.id)">
+                Acknowledge
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="allRequests().length === 0">
+            <td colspan="5" style="text-align: center; padding: 2rem; color: #64748b;">
+              No requests assigned to this vendor.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
