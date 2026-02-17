@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "I:\\ITonline\\PegasusMedApi\\Server\\PegasusMedApi.csproj": {}
+    "I:\\ITonline\\PegasusMedApi\\server\\PegasusMedApi.csproj": {}
   },
   "projects": {
-    "I:\\ITonline\\PegasusMedApi\\Server\\PegasusMedApi.csproj": {
+    "I:\\ITonline\\PegasusMedApi\\server\\PegasusMedApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "I:\\ITonline\\PegasusMedApi\\Server\\PegasusMedApi.csproj",
+        "projectUniqueName": "I:\\ITonline\\PegasusMedApi\\server\\PegasusMedApi.csproj",
         "projectName": "PegasusMedApi",
-        "projectPath": "I:\\ITonline\\PegasusMedApi\\Server\\PegasusMedApi.csproj",
+        "projectPath": "I:\\ITonline\\PegasusMedApi\\server\\PegasusMedApi.csproj",
         "packagesPath": "C:\\Users\\N2\\.nuget\\packages\\",
-        "outputPath": "I:\\ITonline\\PegasusMedApi\\Server\\obj\\",
+        "outputPath": "I:\\ITonline\\PegasusMedApi\\server\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

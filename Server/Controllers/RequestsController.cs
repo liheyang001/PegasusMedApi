@@ -5,105 +5,120 @@ using Microsoft.EntityFrameworkCore;
 
 namespace PegasusMedApi.Server.Controllers;
 
+/// <summary>
+/// Data transfer object for creating a medical supply request.
+/// </summary>
+public record CreateRequestRequest(
+    int ClientId, 
+    string ItemDetails, 
+    List<string> VendorIds, 
+    bool IsFlagged
+);
+
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/requests")]
 public class RequestsController : ControllerBase
 {
-    private readonly ApiDbContext _context;
-    public RequestsController(ApiDbContext context)
-    {
-        _context = context;
-    }
-    [HttpPost]
-    public async Task<IActionResult> CreateRequest(CreateRequestDto dto)
-    {
-        var newRequest = new MedRequest
-        {
-            ClientId = dto.ClientId.ToString(),
-            ItemDetails = dto.ItemDetails,
-            CreatedAt = DateTime.UtcNow,
-            VendorAssignments = new List<VendorStatus>()
-        };
+    private readonly ApiDbContext _db;
 
-        foreach (var vId in dto.VendorIds)
+    public RequestsController(ApiDbContext db) => _db = db;
+
+    /// <summary>
+    /// Creates a new medical supply request and assigns it to specified vendors.
+    /// </summary>
+    /// <param name="req">The request payload from the client.</param>
+    /// <returns>A response with the new request data.</returns>
+    [HttpPost]
+    public async Task<IActionResult> CreateRequest(CreateRequestRequest req)
+    {
+        var entry = new MedRequest
         {
-            newRequest.VendorAssignments.Add(new VendorStatus
+            ClientId = req.ClientId.ToString(),
+            ItemDetails = req.ItemDetails,
+            VendorAssignments = req.VendorIds.Select(vId => new VendorStatus
             {
                 VendorId = vId,
-                IsFlagged = false
-            });
-        }
-        _context.Requests.Add(newRequest);
-
-        await _context.SaveChangesAsync();
-
-        return Ok(newRequest);
+                IsFlagged = req.IsFlagged
+            }).ToList()
+        };
+        _db.Requests.Add(entry);
+        await _db.SaveChangesAsync();
+        return Ok(entry);
     }
 
-    [HttpGet("{id}")]
+    /// <summary>
+    /// Retrieves a specific medical request by its unique integer ID.
+    /// </summary>
+    /// <param name="id">The integer ID of the request.</param>
+    /// <returns>The request details including vendor assignments.</returns>
+    [HttpGet("{id:int}")]
     public async Task<IActionResult> GetRequestById(int id)
     {
-        var request = await _context.Requests
+        var request = await _db.Requests
             .Include(r => r.VendorAssignments)
             .FirstOrDefaultAsync(r => r.Id == id); 
-
-        if (request == null) return NotFound();
-
+        if (request == null) 
+        {
+            return NotFound();
+        }
         return Ok(request);
     }
 
+    /// <summary>
+    /// Gets all medical requests assigned to a specific vendor.
+    /// </summary>
+    /// <param name="vendorId">The string ID of the vendor.</param>
+    /// <returns>A list of summarized requests for the vendor.</returns>
     [HttpGet("vendor/{vendorId}")]
     public async Task<IActionResult> GetRequestsForVendor(string vendorId)
     {
-        var vendorRequests = await _context.Requests
-            .Where(r => r.VendorAssignments.Any(v => v.VendorId == vendorId))
-            .Select(r => new {
-                r.Id,
-                r.ClientId,
-                r.ItemDetails,
-                r.CreatedAt,
-                MyStatus = r.VendorAssignments
-                            .Where(v => v.VendorId == vendorId)
-                            .Select(v => new { v.IsFlagged })
-                            .FirstOrDefault()
-            })
+        var allRequests = await _db.Requests
+            .Include(r => r.VendorAssignments)
             .ToListAsync();
-
-        if (!vendorRequests.Any())
+        var results = new List<object>();
+        foreach (var req in allRequests)
         {
-            return NotFound($"No requests found for vendor: {vendorId}");
+            foreach (var assignment in req.VendorAssignments)
+            {
+                if (assignment.VendorId == vendorId)
+                {
+                    var summary = new {
+                        Id = req.Id,
+                        ClientId = req.ClientId,
+                        ItemDetails = req.ItemDetails,
+                        CreatedAt = req.CreatedAt,
+                        IsFlagged = assignment.IsFlagged
+                    };
+                    results.Add(summary);
+                }
+            }
         }
-
-        return Ok(vendorRequests);
+        if (results.Count == 0)
+        {
+            return NotFound();
+        }
+        return Ok(results);
     }
 
-    [HttpPatch("{id}/vendor/{vendorId}/acknowledge")]
+    /// <summary>
+    /// Updates the acknowledgment status for a specific vendor on a request.
+    /// </summary>
+    /// <param name="id">The integer ID of the request.</param>
+    /// <param name="vendorId">The string ID of the vendor.</param>
+    /// <returns>A confirmation message if updated successfully.</returns>
+    [HttpPatch("{id:int}/vendor/{vendorId}/acknowledge")]
     public async Task<IActionResult> Acknowledge(int id, string vendorId)
     {
-        var assignment = await _context.VendorStatuses
+        var assignment = await _db.VendorStatuses
             .FirstOrDefaultAsync(v => v.MedRequestId == id && v.VendorId == vendorId);
 
         if (assignment == null)
         {
-            return NotFound($"Assignment not found for Request {id} and Vendor {vendorId}");
+            return NotFound();
         }
         assignment.AcknowledgedAt = DateTime.UtcNow;
         assignment.IsFlagged = true; 
-
-        await _context.SaveChangesAsync();
-
-        return Ok(new 
-        { 
-            message = "Acknowledged and Flagged", 
-            time = assignment.AcknowledgedAt, 
-            isFlagged = assignment.IsFlagged 
-        });
+        await _db.SaveChangesAsync();
+        return Ok(new { message = "Update successful" });
     }
-}
-
-public class CreateRequestDto
-{
-    public int ClientId { get; set; }
-    public string ItemDetails { get; set; } = "";
-    public List<string> VendorIds { get; set; } = new();
 }

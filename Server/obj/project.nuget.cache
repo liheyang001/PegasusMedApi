@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "TSVfRW+npOE=",
+  "dgSpecHash": "LSoSbFDYChk=",
   "success": true,
-  "projectFilePath": "I:\\ITonline\\PegasusMedApi\\Server\\PegasusMedApi.csproj",
+  "projectFilePath": "I:\\ITonline\\PegasusMedApi\\server\\PegasusMedApi.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\N2\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\N2\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.3\\microsoft.aspnetcore.openapi.10.0.3.nupkg.sha512",
