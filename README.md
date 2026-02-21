@@ -17,7 +17,9 @@ To run this project locally, you need to set up the PostgreSQL Database
   "DefaultConnection": "Host=localhost;Database=PegasusMedDb;Username=postgres;Password=1234"
 4. Update the `Password` field (currently `1234`) to match your local PostgreSQL password.
 }```
-5. Run ```dotnet ef database update``` in the terminal
+5. Run ```dotnet ef migrations remove
+dotnet ef migrations add InitialCreate
+dotnet ef database update```
 
 ### Frontend Setup (Angular)
 1. Navigate to the client folder: cd PegasusMedApi.Client

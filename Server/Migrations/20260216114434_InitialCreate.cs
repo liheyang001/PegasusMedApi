@@ -33,7 +33,6 @@ namespace PegasusMedApi.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    MedicalRequestId = table.Column<int>(type: "integer", nullable: false),
                     VendorId = table.Column<string>(type: "text", nullable: false),
                     IsFlagged = table.Column<bool>(type: "boolean", nullable: false),
                     AcknowledgedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
